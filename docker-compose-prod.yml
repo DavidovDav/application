@@ -1,0 +1,59 @@
+version: '3.9'
+
+services:
+  nginx:
+    container_name: nginx
+    build: .
+    hostname: nginx
+    volumes:
+      - ./flask/templates:/usr/share/nginx/html/templates:rw
+    #  - ./nginx.conf:/etc/nginx/conf.d/:rw
+    ports:
+      - "80:80"
+    depends_on:
+      - flask
+    networks:
+      - frontend
+
+  flask:
+    container_name: flask
+    image: 644435390668.dkr.ecr.eu-west-3.amazonaws.com/david-projects:${TAG:-latest}
+    hostname: flask
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    environment:
+      - TAG=${TAG:-latest}
+    healthcheck:
+      test:  ["CMD", "mongodb", "ping", "-h", "localhost"]
+      start_period: 5s
+      interval: 5s
+      timeout: 7s
+      retries: 7
+    networks:
+      - frontend
+      - backend
+
+  mongo:
+    container_name: mongo
+    image: mongo:6.0
+    hostname: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass
+      MONGO_INITDB_DATABASE: mongo
+    volumes:
+      - ./mongo-data:/data/db
+      #- ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+    networks:
+      - backend
+
+volumes:
+  mongo-data:
+    external: true
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
