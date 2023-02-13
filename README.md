@@ -11,11 +11,11 @@ Which tools the project using for: Cloud - AWS
 
 ## AWS 
 ### EC2: 2 instances
-1. **testing-ci/cd** - Testing instance that running the buildings, testings and else.
+1. **testing** - Testing instance that running the buildings, testings and else.
 2. **production** - Production instance that running 24/7.
 
 ### ECR: 
-**david-projects** - Archived the images that passed the tests and published.
+**flask-image** - Archived the images that passed the tests and published.<br />
 For download Docker and Docker compose you can use **install-docker.sh**.
 
 * Note that the public ip addresses changes each time the machines are restarted, if you dont use Elastic IP or DNS so need to make changes in Jenkins base url, Jenkinsfile and GitHub Webhook.

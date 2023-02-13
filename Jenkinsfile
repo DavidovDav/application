@@ -2,10 +2,10 @@ pipeline{
     agent any
     environment{
     // Testing instance (ci/cd)
-        TEST_PUB_IP = "15.237.50.119"
+        TEST_PUB_IP = "13.38.26.52"
         TEST_PRI_IP = "10.0.6.65"
     // Production instance
-        PROD_PUB_IP = "35.180.99.133"
+        PROD_PUB_IP = "13.38.77.95"
         PROD_PRI_IP = "10.0.9.29"
     // AWS account
         AWS_ACCOUNT_ID = "644435390668"

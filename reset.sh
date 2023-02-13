@@ -1,8 +1,8 @@
 #!/bin/bash
 sudo rm -r ./mongo-data
 docker ps -a | grep -v "jenkins" | awk '{print $1}' | xargs docker rm -f
-docker images | awk '$1 == "<none>" && $2 == "<none>" {print $3}' | xargs docker rmi
-docker images | grep -v "jenkins" | awk '{print $1":"$2}' | grep -v "python:3.8" | xargs -n 1 docker rmi -f
+docker images -a | awk '$2 == "<none>" {print $3}' | xargs docker rmi -f
+docker images -a | grep -v "jenkins" | grep -v "python:3.8" | awk '{print $1":"$2}' | xargs -n 1 docker rmi -f
 docker volume ls | grep -v "jenkins-server_jenkins_home" | awk '{print $2}' | docker volume prune -f
 docker network prune -f
 
