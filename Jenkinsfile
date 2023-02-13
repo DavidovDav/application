@@ -10,7 +10,7 @@ pipeline{
     // AWS account
         AWS_ACCOUNT_ID = "644435390668"
         AWS_DEFAULT_REGION = "eu-west-3"
-        IMAGE_REPO_NAME = "david-projects"
+        IMAGE_REPO_NAME = "flask-image-david"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
     }
     stages{
@@ -171,7 +171,7 @@ pipeline{
                 cd application
                 scp ubuntu@\${TEST_PRI_IP}:~/application/deploy.sh ec2-user@\${PROD_PRI_IP}:~/application/deploy.sh
                 bash deploy.sh \${TEST_PRI_IP} \${PROD_PRI_IP}
-                docker pull 644435390668.dkr.ecr.eu-west-3.amazonaws.com/david-projects:\${IMAGE_TAG}
+                docker pull 644435390668.dkr.ecr.eu-west-3.amazonaws.com/flask-image-david:\${IMAGE_TAG}
                 "
                 """
 
