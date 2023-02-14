@@ -26,7 +26,7 @@ services:
     environment:
       - TAG=${TAG:-latest}
     healthcheck:
-      test:  ["CMD", "mongodb", "ping", "-h", "localhost"]
+      test:  ["CMD", "mongodb", "ping", "-h", "mongo"]
       start_period: 5s
       interval: 5s
       timeout: 7s
@@ -45,7 +45,7 @@ services:
       MONGO_INITDB_DATABASE: mongo
     volumes:
       - ./mongo-data:/data/db
-      - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+      #- ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
     networks:
       - backend
 

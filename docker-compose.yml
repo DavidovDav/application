@@ -24,7 +24,7 @@ services:
     depends_on:
       - mongo
     healthcheck:
-      test:  ["CMD", "mongodb", "ping", "-h", "localhost"]
+      test:  ["CMD", "mongodb", "ping", "-h", "mongo"]
       start_period: 5s
       interval: 5s
       timeout: 7s

@@ -2,7 +2,7 @@ pipeline{
     agent any
     environment{
     // Testing instance (ci/cd)
-        TEST_PUB_IP = "35.180.44.211"
+        TEST_PUB_IP = "35.180.250.170"
         TEST_PRI_IP = "10.0.6.65"
     // Production instance
         PROD_PUB_IP = "13.38.84.229"
@@ -51,7 +51,7 @@ pipeline{
                 echo "=================================="
                 sh '''
                 docker ps
-                curl -I -m 30 http://\${TEST_PUB_IP}:80/hello
+                curl -I -m 30 http://\${TEST_PUB_IP}:80/metrics
                 curl -I -m 30 http://\${TEST_PUB_IP}:80
                 '''
                 echo "======================================="
@@ -197,7 +197,7 @@ pipeline{
                 
                 sh '''
                 docker ps
-                curl -I -m 30 http://\${PROD_PUB_IP}:80/hello
+                curl -I -m 30 http://\${PROD_PUB_IP}:80/metrics
                 curl -I -m 30 http://\${PROD_PUB_IP}:80
                 '''
 

@@ -2,31 +2,55 @@ from flask import Flask, render_template, request, url_for, redirect, jsonify
 #from flask_pymongo import PyMongo
 from pymongo import MongoClient
 
-# Connect to data base and else.
-app = Flask(__name__)   # Create a new Flask application and assigns it to the variable 'app'.
-
+# Create a new Flask application and assigns it to the variable 'app'.
+app = Flask(__name__)
 # Create and execute mongodb
-def get_db():
-    client = MongoClient(host='mongo',
-                        port=27017,
-                        user='root',
-                        password='pass',
-                        authoSource='admin')
-    db = client["mongo"]
-    return db
-    
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-#app.config["MONGO_URI"] = "mongodb://localhost:27017/mongo"         # Sets a configuration option for the Flask application that specifies the URI of the MongoDB server to connect to.
-#pp.config['JSONIFY_PRETTYPRINT_REGULAR'] = True                     # Sets a configuration option for the Flask application that enables "pretty printing" of JSON responses.
-#mongo = PyMongo(app)                                                # Creates a new instance of PyMongo and associates it with the Flask application.
-#client = MongoClient(app.config["MONGO_URI"])                       # Creates a new instance of MongoClient which is a class of pymongo package.
-#db = client.mongo                                                   # Connect to the "db" database.
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+client = MongoClient(host="mongo", port=27017, username="root", password="pass", authSource="admin")
+db = client["mongo"]
+#db = client.flask_db
+collection = db["people"]
+
+@app.route("/")
+def home():
+    return render_template('index.html')
 
 # The home page
 @app.route("/hello")
-def home():
-    return "Hello David! v0.1.3"
+def hello():
+    return "Hello! v0.1.0"
+
+@app.route("/person/<string:person_id>", methods=["GET"])
+def get_person(person_id):
+    person = collection.find_one({"id": person_id})
+    if person:
+        return jsonify(person), 200
+    else:
+        return jsonify({"error": "Person not found"}), 404
+
+@app.route("/person", methods=["GET"])
+def get_people():
+    people = [person["id"] for person in collection.find()]
+    return jsonify({"people": people}), 200
+
+@app.route("/person/<string:person_id>", methods=["PUT"])
+def update_person(person_id):
+    person = request.get_json()
+    person["id"] = person_id
+    collection.replace_one({"id": person_id}, person, upsert=True)
+    return jsonify({"message": "Person updated"}), 200
+
+@app.route("/person/<string:person_id>", methods=["DELETE"])
+def delete_person(person_id):
+    result = collection.delete_one({"id": person_id})
+    if result.deleted_count:
+        return jsonify({"message": "Person deleted"}), 200
+    else:
+        return jsonify({"error": "Person not fount"}), 404
+
+@app.route("/metrics")
+def metrics():
+    # Placeholder endpoint for monitoring
+    return jsonify({}), 200
 
 #@app.route('/person/<id>', methods=['POST'])
 #def add_person(id):
