@@ -26,7 +26,7 @@ def get_db():
 # The home page
 @app.route("/hello")
 def home():
-    return "Hello David! v0.1.0"
+    return "Hello David! v0.1.3"
 
 #@app.route('/person/<id>', methods=['POST'])
 #def add_person(id):

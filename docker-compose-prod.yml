@@ -17,7 +17,7 @@ services:
 
   flask:
     container_name: flask
-    image: 644435390668.dkr.ecr.eu-west-3.amazonaws.com/david-projects:${TAG:-latest}
+    image: 644435390668.dkr.ecr.eu-west-3.amazonaws.com/flask-image-david:${TAG:-latest}
     hostname: flask
     links:
       - mongo
@@ -45,7 +45,7 @@ services:
       MONGO_INITDB_DATABASE: mongo
     volumes:
       - ./mongo-data:/data/db
-      #- ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
+      - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:ro
     networks:
       - backend
 
