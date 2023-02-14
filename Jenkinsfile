@@ -5,7 +5,7 @@ pipeline{
         TEST_PUB_IP = "35.180.250.170"
         TEST_PRI_IP = "10.0.6.65"
     // Production instance
-        PROD_PUB_IP = "13.38.84.229"
+        PROD_PUB_IP = "15.237.46.232"
         PROD_PRI_IP = "10.0.9.29"
     // AWS account
         AWS_ACCOUNT_ID = "644435390668"
