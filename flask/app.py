@@ -6,9 +6,7 @@ from pymongo import MongoClient
 app = Flask(__name__)
 # Create and execute mongodb
 client = MongoClient(host="mongo", port=27017, username="root", password="pass", authSource="admin")
-db = client["mongo"]
-#db = client.flask_db
-collection = db["people"]
+collection = client["myMongo"]["people"] # Connect to data base then to collection (/myMongo/people)
 
 @app.route("/")
 def home():
