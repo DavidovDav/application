@@ -1,0 +1,126 @@
+Create person
+   # If request is not json.
+    if request.headers.get('Content-Type') != 'application/json':
+        return jsonify({'error': 'Only JSON content type is supported'}), 400
+
+    data = request.get_json()
+
+    # if no data is entered
+    if "person_id" not in data or 'name' not in data or 'age' not in data or 'age' not in data or 'gender' not in data or 'phone' not in data:
+        return "Missing person data", 400
+
+    person = people.find_one({'person_id': data['person_id']})
+    # If the person data is already exist.
+    if person:
+        return "Person already exists", 409
+    
+    result = people.insert_one(data)
+    return "Person created successfuly.", 201
+
+
+
+
+
+
+index.html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Flask Application</title>
+</head>
+<body>
+    <h1>My Flask Application</h1>
+    
+    <h2>Create Person</h2>
+    <form method="POST" action="/person" enctype="application/json">
+        <label for="person_id">ID:</label>
+        <input type="text" id="person_id" name="id" required><br><br>
+        
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+        
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select><br><br>
+
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required><br><br>
+        
+        <button type="button" oneclick="createPerson()">Create person</button>
+    </form>
+    
+    <script>
+    function createPerson() {
+      const url = 'http://localhost:5000/person';
+      const data = {
+        "person_id": $('#person_id').val(),
+        "name": $('#name').val(),
+        "age": $('#age').val(),
+        "gender": $('#gender').val(),
+        "phone": $('#phone').val()
+      };
+      const headers = {'Content-Type': 'application/json'};
+      
+      axios.post(url, JSON.stringify(data), {headers: headers})
+        .then(response => {
+          console.log(response.data);
+          alert('Person created successfully!');
+        })
+        .catch(error => {
+          console.log(error.response.data);
+          alert('Error creating person!');
+        });
+    }
+    </script>
+
+    <h2>Get Person</h2>
+    <form method="GET" action="/person" enctype="application/json">
+        <label for="person_id">ID:</label>
+        <input type="text" id="person_id" name="id" required><br><br>
+        
+        <button type="submit">Get</button>
+    </form>
+    
+    <h2>Get All People IDs</h2>
+    <form method="GET" action="/person" enctype="application/json">
+        <button type="submit">Get All</button>
+    </form>
+    
+    <h2>Update Person</h2>
+    <form method="PUT" action="/person" enctype="application/json">
+        <label for="person_id">ID:</label>
+        <input type="text" id="person_id" name="id" required><br><br>
+        
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+        
+        <label for="gender">Gender:</label>
+        <input type="text" id="gender" name="gender" required><br><br>
+
+        <label for="phone">Phone:</label>
+        <input type="text" id="phone" name="phone" required><br><br>
+        
+        <button type="submit">Update</button>
+    </form>
+    
+    <h2>Delete Person</h2>
+    <form method="DELETE" action="/person" enctype="application/json">
+        <label for="person_id">ID:</label>
+        <input type="text" id="person_id" name="id" required><br><br>
+        
+        <button type="submit">Delete</button>
+    </form>
+    
+</body>
+</html>

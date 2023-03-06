@@ -7,7 +7,6 @@ Which tools the project using for: Cloud - AWS
 5. DataBase: Mongo
 6. Scripting: Bash
 7. CI/CD: jenkins
-8. Bonus: Terraform
 
 ## AWS 
 ### EC2: 2 instances
@@ -15,7 +14,7 @@ Which tools the project using for: Cloud - AWS
 2. **production** - Production instance that running 24/7.
 
 ### ECR: 
-**flask-image** - Archived the images that passed the tests and published.<br />
+**flask-image** - This repository in AWS ECR archived the images that passed the tests and published.<br />
 For download Docker and Docker compose you can use **install-docker.sh**.
 
 * Note that the public ip addresses changes each time the machines are restarted, if you dont use Elastic IP or DNS so need to make changes in Jenkins base url, Jenkinsfile and GitHub Webhook.
@@ -45,11 +44,9 @@ update the version of the releases in the next files:
 
 ## Application 
 ### Flask:
-
 ### Nginx:
 Reverse proxy
-
-### Mongo-DB:
+### Mongo-DB
 
 ## other files and scripts:
 * **delete-tags.sh** that clean the history of tags in local and remote repo if you need.
