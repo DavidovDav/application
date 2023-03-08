@@ -10,7 +10,9 @@ client = MongoClient(host="mongo",
                     password="pass", 
                     authSource="admin")
 # Connect to data base then to collection (/myMongo/people)
-people = client["myMongo"]["people"] 
+#people = client["myMongo"]["people"]
+db = client["myMongo"]
+people = db["myPeople"]
 
 @app.route("/health")
 def health_check():
@@ -26,39 +28,45 @@ def home():
 def hello():
     return "Hello! v0.1.0"
 
-@app.route("/person", methods=["GET"])
+@app.route("/person/<int:person_id>", methods=["GET"])
 def get_person(person_id):
-    result = people.find_one({"id": Objectid(person_id)})
+    result = people.find_one({"person_id": Objectid(person_id)})
     if result is None:
         return jsonify({"error": "Person not found"}), 404
     return jsonify(result), 200
 
 # To get the all peoples in data base.
-@app.route("/people", methods=["GET"])
+@app.route("/person/get_all", methods=["GET"])
 def get_peoples():
     results = people.find({})
     return jsonify(list(results)), 200
 
 # Create some person.
-@app.route("/people", methods=["POST"])
+@app.route("/person", methods=["POST"])
 def create_person():
-    person_data = request.json
-    result = people.insert_one(person_data)
-    return jsonify({"id": str(result.inserted_id)}), 200
+    data = request.json()
+    person_id = data['person_id']
+    name = data['name']
+    age = data['age']
+    gender = data['gender']
+    phone = data['phone']
+    new_person = {"person_id": person_id, "name": name, "age": age, "gender": gender, "phone": phone}
+    people.insert_one(new_person)
+    return "Person created successfully!", 201
 
 # Update person data
-@app.route("/people", methods=["PUT"])
+@app.route("/person/<int:person_id>", methods=["PUT"])
 def update_person(person_id):
     person_data = request.json
-    result = people.update_one({"id": Objectid(person_id)}, {"$set": person_data})
+    result = people.update_one({"person_id": Objectid(person_id)}, {"$set": person_data})
     if result.matched_count == 0:
         return jsonify({"error": "Person not found"}), 404
     return jsonify({"message": "Person updated succesfully"}), 200
 
 # Delete some person.
-@app.route("/person", methods=["DELETE"])
+@app.route("/person/<int:person_id>", methods=["DELETE"])
 def delete_person(person_id): 
-    result = people.delete_one({"_id": Objectid(person_id)})
+    result = people.delete_one({"person_id": Objectid(person_id)})
     if result.delete_count == 0:
         return jsonify({"error": "Person not fount"}), 404
     return jsonify({"message": "Person deleted successfully"}), 200
