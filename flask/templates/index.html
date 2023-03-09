@@ -14,10 +14,16 @@
                 var age = $("#age").val();
                 var gender = $("#gender").val();
                 var phone = $("#phone").val();
-                var data = JSON.stringify({"person_id": person_id, "name": name, "age": age, "gender": gender, "phone": phone});
+                var data = JSON.stringify({
+					"person_id": person_id,
+					"name": name,
+					"age": age,
+					"gender": gender,
+					"phone": phone
+				});
                 $.ajax({
                     type: "POST",
-                    url: "/person",
+                    url: "/person/" + person_id,
                     contentType: "application/json",
                     data: data,
                     success: function(){
@@ -45,7 +51,7 @@
 				});
 				$.ajax({
 					type: "PUT",
-					url: "/person/<int:person_id>",
+					url: "/person/" + person_id,
 					contentType: "application/json",
 					data: data,
 					success: function() {
@@ -62,7 +68,7 @@
 				var person_id = $("#person_id").val();
 				$.ajax({
 					type: "DELETE",
-					url: "/person/<int:person_id>",
+					url: "/person/" + person_id,
 					contentType: "application/json",
 					data: JSON.stringify({"person_id": person_id}),
 					success: function() {
@@ -79,8 +85,8 @@
 				var person_id = $("#person_id").val();
 				$.ajax({
 					type: "GET",
-					url: "/person/<int:person_id>" + id,
-					dataType: "application/json",
+					url: "/person/" + person_id,
+					dataType: "json",
 					success: function(data) {
 						alert("Name: " + data.name + "\nAge: " + data.age + "\nGender: " + data.gender + "\nPhone: " + data.phone);
 					},
@@ -93,13 +99,13 @@
 			$("#get-all-form").submit(function(event){
 				event.preventDefault();
 				$.ajax({
-					type:"GET",
-					utl:"/person/get_all",
-					dataType:"application/json",
+					type: "GET",
+					url: "/person",
+					dataType:"json",
 					success: function(data){
 						var people = "";
 						for(var i = 0; i < data.length; i++){
-							people += "ID: " + data[i].person_id + "/nName: " + data[i].name + "/nAge: " + data[i].age + "/nGender" + data[i].gender + "/nPhone: " + data[i].phone + "/n/n";
+							people += "ID: " + data[i].person_id + "\nName: " + data[i].name + "\nAge: " + data[i].age + "\nGender" + data[i].gender + "\nPhone: " + data[i].phone + "\n\n";
 						}
 						alert(people);
 					},
@@ -127,60 +133,73 @@
     		<label for="age">Age:</label>
     		<input type="number" id="age" name="age" required><br><br>
         </div>
+		<div>
     		<label for="gender">Gender:</label>
     		<select id="gender" name="gender" required>
     	    	<option value="male">Male</option>
     	    	<option value="female">Female</option>
     	    	<option value="other">Other</option>
-    		</select>
+    		</select><br><br>
 		</div>
 		<div>
     		<label for="phone">Phone:</label>
-    		<input type="tell" id="phone" name="phone" required><br><br>
+    		<input type="tel" id="phone" name="phone" required><br><br>
     		<button type="submit">Create Person</button> 
 		</div>	
 	</form>
     
     <h2>Update Person</h2>
 	<form id="update-form">
-		<label for="person_id">ID:</label>
-		<input type="text" id="person_id" name="person_id"><br>
-
-		<label for="name">Name:</label><br>
-		<input type="text" id="name" name="name"><br>
-
-		<label for="age">Age:</label><br>
-		<input type="number" id="age" name="age"><br>
-
-		<label for="gender">Gender:</label><br>
-		<select id="gender" name="gender">
-		  <option value="male">Male</option>
-		  <option value="female">Female</option>
-	      <option value="other">Other</option>
-		</select><br>
-
-		<label for="phone">Phone:</label><br>
-		<input type="tell" id="phone" name="phone"><br>
-		<button type="submit">Update Person</button>
+		<div>
+    		<label for="person_id">ID:</label>
+    		<input type="text" id="person_id" name="person_id" required><br><br>
+		</div>
+		<div> 
+    		<label for="name">Name:</label>
+    		<input type="text" id="name" name="name" required><br><br>
+		</div>
+		<div>
+    		<label for="age">Age:</label>
+    		<input type="number" id="age" name="age" required><br><br>
+        </div>
+		<div>
+    		<label for="gender">Gender:</label>
+    		<select id="gender" name="gender" required>
+    	    	<option value="male">Male</option>
+    	    	<option value="female">Female</option>
+    	    	<option value="other">Other</option>
+    		</select><br><br>
+		</div>
+		<div>
+    		<label for="phone">Phone:</label>
+    		<input type="tel" id="phone" name="phone" required><br><br>
+    		<button type="submit">Update Person</button> 
+		</div>
 	</form>
 
     <h2>Delete Person</h2>
 	<form id="delete-form">
-		<label for="person_id">ID:</label><br>
-		<input type="text" id="person_id" name="person_id"><br>
-		<button type="submit">Delete Person</button>
+		<div>
+			<label for="person_id">ID:</label><br>
+			<input type="text" id="person_id" name="person_id"><br>
+			<button type="submit">Delete Person</button>
+		</div>
 	</form>
 
 	<h2>Get Person</h2>
 	<form id="get-form">
-		<label for="person_id">ID:</label><br>
-		<input type="text" id="person_id" name="person_id"><br>
-		<button type="submit">Get Person</button>
+		<div>
+			<label for="person_id">ID:</label><br>
+			<input type="text" id="person_id" name="person_id"><br>
+			<button type="submit">Get Person</button>
+		</div>
 	</form>
 
 	<h2>Get All People</h2>
 	<form id="get-all-form">
-		<button type="submit">Get All People</button>
+		<div>
+			<button type="submit">Get All People</button>
+		</div>
 	</form>
 </body>
 </html>
