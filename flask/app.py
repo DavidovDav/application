@@ -1,79 +1,131 @@
 from flask import Flask, render_template, request, url_for, redirect, jsonify, Response
+import pymongo
 from pymongo import MongoClient
+import bson
+from bson.objectid import ObjectId
+from bson import ObjectId
 
 # Create a new Flask application and assigns it to the variable 'app'.
 app = Flask(__name__)
 # Create and execute mongodb
-client = MongoClient(host="mongo", 
-                    port=27017, 
-                    username="root", 
-                    password="pass", 
-                    authSource="admin")
-# Connect to data base then to collection (/myMongo/people)
-#people = client["myMongo"]["people"]
-db = client["myMongo"]
-people = db["myPeople"]
+def get_db():
+    client = MongoClient(host="mongo", 
+                        port=27017, 
+                        username="root", 
+                        password="pass", 
+                        authSource="admin")
+    # Connect to data base then to collection (/myMongo/people)
+    db = client["myMongo"]
+    return db
 
 # Home page.
 @app.route("/")
 def home():
     return render_template('index.html')
 
-@app.route("/hello")
+@app.route("/metrics")
 def hello():
     return "Hello! v0.1.0"
 
-@app.route("/person/<int:person_id>", methods=["GET"])
+@app.route("/person/<person_id>", methods=["GET"])
 def get_person(person_id):
+    db = get_db()
+    people = db["myPeople"]
     person = people.find_one({"person_id": person_id})
     if person:
         return jsonify(person), 200
     else:
-        return "Person not found.", 404
+        return jsonify({"error": "Person not found."}), 404
 
 
 # To get the all peoples in data base.
 @app.route("/person", methods=["GET"])
 def get_peoples():
-    results = people.find({})
-    return jsonify(list(results)), 200
+    try:
+        db = get_db()
+        people = db["myPeople"]
+        _peoples = people.find()
+        peoples = [{
+            "person_id": str(person["_id"]),
+            "name": person["name"],
+            "age": person["age"],
+            "gender": person["gender"],
+            "phone": person["phone"]
+            } for person in _peoples]
+        return jsonify({"peoples": peoples})
+    except Exception as e:
+        return jsonify({"error": f"Error while fetching persons: {str(e)}"}), 500
+    finally:
+        if type(db) == MongoClient:
+            db.close()
 
 # Create some person.
-@app.route("/person/<int:person_id>", methods=["POST"])
-def create_person(person_id):
-    data = request.get_json()
-    person_id = data['person_id']
-    name = data['name']
-    age = data['age']
-    gender = data['gender']
-    phone = data['phone']
+@app.route("/person", methods=["POST"])
+def create_person():
+    db = get_db()
+    people = db["myPeople"]
+    person_id = request.form.get("person_id")
+    name = request.form.get("name")
+    age = request.form.get("age")
+    gender = request.form.get("gender")
+    phone = request.form.get("phone")
     new_person = {
-        "person_id": person_id,
         "name": name,
         "age": age,
         "gender": gender,
         "phone": phone
         }
     result = people.insert_one(new_person)
-    location = url_for('get_person', person_id=person_id, _exteranl=True)
-    return Response(status=201,headers={"Location": location})
+    return jsonify({"person_id": str(result.inserted_id)}, {"message": "Person created succefully!"})
 
 # Update person data
-@app.route("/person/<int:person_id>", methods=["PUT"])
+@app.route("/person/<person_id>/update", methods=["PUT"])
 def update_person(person_id):
-    person_data = request.get_json()
-    result = people.update_one({"person_id": person_id},{"$set": person_data})
-    if result.matched_count == 0:
-        return jsonify({"error": "Person not found"}), 404
-    return jsonify({"message": "Person updated succesfully"}), 200
+    db = get_db()
+    people = db["myPeople"]
+
+    person_id = request.form.get("person_id")
+    person_id = ObjectId(person_id)
+
+    name = request.form.get("name")
+    age = request.form.get("age")
+    gender = request.form.get("gender")
+    phone = request.form.get("phone")
+    person_data = {
+        "name": name,
+        "age": age,
+        "gender": gender,
+        "phone": phone
+    }
+    result = people.update_one({"_id": ObjectId(person_id)}, {"$set": person_data})
+    if result.modified_count > 0:
+        return jsonify({"message": "Person updated successfully!"}), 200
+    else:
+        return jsonify({"error": "Failed to update person."}), 500
 
 # Delete some person.
-@app.route("/person/<int:person_id>", methods=["DELETE"])
+@app.route("/person/<person_id>/delete", methods=["DELETE"])
 def delete_person(person_id): 
-    result = people.delete_one({"person_id": person_id})
-    if result.delete_count == 0:
-        return jsonify({"error": "Person not fount"}), 404
-    return jsonify({"message": "Person deleted successfully"}), 200
+    person_id = request.form.get("person_id")
+    person_id = ObjectId(person_id)
+
+    db = get_db()
+    people = db["myPeople"]
+    
+    try:
+        person_id = ObjectId(person_id)
+    except bson.errors.InvaildId:
+        return jsonify({"error": "invaild object id."}), 400
+    
+    person = people.find_one({"person_id": person_id})
+    if person is None:
+        return jsonify({"error": "Person not found."}), 404
+    
+    result = people.delet_one({"person_id": person_id})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Failed to delete person."}), 500
+    
+    return jsonify({"message": "Person deleted successfully!"}), 200
 
 @app.after_request
 def add_header(response):
