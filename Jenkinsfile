@@ -1,16 +1,16 @@
 pipeline{
     agent any
     environment{
-    // Testing instance (ci/cd)
-        TEST_PUB_IP = "35.180.250.170"
-        TEST_PRI_IP = "10.0.6.65"
+    // Testing instance (ci)
+        TEST_PUB_IP = "35.158.166.16"
+        TEST_PRI_IP = "10.0.14.221"
     // Production instance
-        PROD_PUB_IP = "15.237.46.232"
-        PROD_PRI_IP = "10.0.9.29"
+        PROD_PUB_IP = "3.68.149.57"
+        PROD_PRI_IP = "10.0.11.128"
     // AWS account
-        AWS_ACCOUNT_ID = "644435390668"
-        AWS_DEFAULT_REGION = "eu-west-3"
-        IMAGE_REPO_NAME = "flask-image-david"
+        AWS_ACCOUNT_ID = "739748450714"
+        AWS_DEFAULT_REGION = "eu-central-1"
+        IMAGE_REPO_NAME = "flask-images"
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
     }
     stages{
@@ -136,7 +136,7 @@ pipeline{
             steps{
                 withCredentials([aws(credentialsId: 'ak-david', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
-                    ssh -tt -o ConnectTimeout=30 ec2-user@\${PROD_PRI_IP} "
+                    ssh -tt -o ConnectTimeout=30 ubuntu@\${PROD_PRI_IP} "
                     sudo yum update
                     sudo yum install -y awscli
                     aws configure set aws_access_key_id \${AWS_ACCESS_KEY_ID}
@@ -164,14 +164,14 @@ pipeline{
                 echo "==========================================================="
 
                 sh """
-                ssh -tt -o ConnectTimeout=30 ec2-user@\${PROD_PRI_IP} "
+                ssh -tt -o ConnectTimeout=30 ubuntu@\${PROD_PRI_IP} "
                 if [ ! -d ~/application ]; then
                     mkdir ~/application
                 fi
                 cd application
-                scp ubuntu@\${TEST_PRI_IP}:~/application/deploy.sh ec2-user@\${PROD_PRI_IP}:~/application/deploy.sh
+                scp ubuntu@\${TEST_PRI_IP}:~/application/deploy.sh ubuntu@\${PROD_PRI_IP}:~/application/deploy.sh
                 bash deploy.sh \${TEST_PRI_IP} \${PROD_PRI_IP}
-                docker pull 644435390668.dkr.ecr.eu-west-3.amazonaws.com/flask-image-david:\${IMAGE_TAG}
+                docker pull 739748450714.dkr.ecr.eu-central-1.amazonaws.com/flask-images:\${IMAGE_TAG}
                 "
                 """
 
@@ -180,12 +180,12 @@ pipeline{
                 echo "=========================================================="
 
                 sh '''
-                ssh -tt -o ConnectTimeout=30 ec2-user@\${PROD_PRI_IP} "
+                ssh -tt -o ConnectTimeout=30 ubuntu@\${PROD_PRI_IP} "
                 cd application
                 if [ ! -d mongo-data ]; then
                     bash create-mdb.sh
                 else
-                    sudo chown -R ec2-user:ec2-user /home/ec2-user/application/mongo-data
+                    sudo chown -R ubuntu:ubuntu /home/ec2-user/application/mongo-data
                 fi
                 TAG=\${IMAGE_TAG} docker-compose up -d --build
                 "

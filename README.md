@@ -29,7 +29,12 @@ update the version of the releases in the next files:
 
 ## Jenkins 
 ### To run Jenkins container with docker:
-<sup>docker run -p 8080:8080 -p 50000:50000 -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts-jdk11 bash apt-get update && apt-get install -y docker.io</sup>
+<sup>docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.sock:/var/run/docker.sock -v ~/jenkins_home/:/var/jenkins_home/ jenkins/jenkins:lts-jdk11</sup>
+
+install docker inside the jenkins container:
+curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall
+
+* Open Port 8080 in the Security Group for using jenkins.
 
 ### Jenkins plugins:
 1. GitHub Integration
