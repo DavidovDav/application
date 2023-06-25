@@ -27,12 +27,12 @@ update the version of the releases in the next files:
 
 ## Jenkins 
 ### To run Jenkins container with docker:
-Before running the jenkins container create a repo for jenkins volume with the right permissions:
-<sup>mkdir jenkins_home && sudo chown -R $USER:$USER ~/jenkins_home</sup>\
-Run the jenkins container:
-<sup>docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.sock:/var/run/docker.sock -v ~/jenkins_home/:/var/jenkins_home/ jenkins/jenkins:lts-jdk11</sup>\
-Install docker inside the jenkins container:
-<sup>curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall</sup>\
+####Before running the jenkins container create a repo for jenkins volume with the right permissions:
+<sup>mkdir jenkins_home && sudo chown -R $USER:$USER ~/jenkins_home</sup>
+####Run the jenkins container:
+<sup>docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.sock:/var/run/docker.sock -v ~/jenkins_home/:/var/jenkins_home/ jenkins/jenkins:lts-jdk11</sup>
+####Install docker inside the jenkins container:
+<sup>curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall</sup>
 
 * Open Port 8080 in the Security Group for using jenkins.
 
