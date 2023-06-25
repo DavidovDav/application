@@ -8,31 +8,31 @@ Which tools the project using for: Cloud - AWS
 6. Scripting: Bash
 7. CI/CD: jenkins
 
-## AWS 
+## AWS
+* Note that the public ip addresses changes each time the machines are restarted, if you dont use Elastic IP or DNS so need to make changes in Jenkins base url, Jenkinsfile and GitHub Webhook. 
 ### EC2: 2 instances
 1. **testing** - Testing instance that running the buildings, testings and else.
 2. **production** - Production instance that running 24/7.
 
 ### ECR: 
-**flask-image** - This repository in AWS ECR archived the images that passed the tests and published.<br />
-For download Docker and Docker compose you can use **install-docker.sh**.
-
-* Note that the public ip addresses changes each time the machines are restarted, if you dont use Elastic IP or DNS so need to make changes in Jenkins base url, Jenkinsfile and GitHub Webhook.
+**flask-images** - This repository in AWS ECR archived the images that passed the tests and published.<br />
 
 ## Git and GitHub
 ### Webhook: 
 After a push is made, a trigger is activated which notifies Jenkins and activates the job.
 ### Versioning strategy: 
 update the version of the releases in the next files:
-1. Evey time that you want to release a new version, need to tag (and push them) the commit. For this we have **push-release.sh** in that script you save the changes, commit, tag and push to the remote repository.
-2. **CHANGELOG.md** is a file that shows all the versions history and their changes, so if we want release new version need to modify this file.
+1. Evey time that before releasing a new version, need to tag (and push) the commit. For this we have **push-release.sh** in that script you save the changes, commit, tag and push to the remote repository.
+2. **CHANGELOG.md** is a file that shows all the versions history and their changes, so when release a new version, recommended to modify this file.
 
 ## Jenkins 
 ### To run Jenkins container with docker:
+Before running the jenkins container create a repo for jenkins volume with the right permissions:
+<sup>mkdir jenkins_home && sudo chown -R $USER:$USER ~/jenkins_home<sup>
+Run the jenkins container:
 <sup>docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.sock:/var/run/docker.sock -v ~/jenkins_home/:/var/jenkins_home/ jenkins/jenkins:lts-jdk11</sup>
-
-install docker inside the jenkins container:
-curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall
+Install docker inside the jenkins container:
+<sup>curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall<sup>
 
 * Open Port 8080 in the Security Group for using jenkins.
 
@@ -46,6 +46,9 @@ curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./doc
 1. AWS
 2. GitHub
 3. Email address
+
+* Make sure that you create a webhook.
+* Create multibranch pipeline job.
 
 ## Application 
 ### Flask:
