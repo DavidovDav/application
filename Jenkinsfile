@@ -1,6 +1,7 @@
 pipeline{
     agent any
     environment{
+    // If you dont have elastic ip please change when the instance start.
     // Testing instance (ci)
         TEST_PUB_IP = "35.158.166.16"
         TEST_PRI_IP = "10.0.14.221"
@@ -33,6 +34,7 @@ pipeline{
                 echo "======================================================"
 
                 sh """
+		sudo apt update && sudo apt upgrade -y
                 docker-compose build --no-cache
                 docker-compose up -d
                 """
@@ -81,7 +83,6 @@ pipeline{
                 // Private ECR syntax
                 withCredentials([aws(credentialsId: 'ak-david', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh """
-                    apt update
                     apt install -y awscli
                     aws configure set aws_access_key_id \${AWS_ACCESS_KEY_ID}
                     aws configure set aws_secret_access_key \${AWS_SECRET_ACCESS_KEY}
@@ -137,8 +138,8 @@ pipeline{
                 withCredentials([aws(credentialsId: 'ak-david', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
                     ssh -tt -o ConnectTimeout=30 ubuntu@\${PROD_PRI_IP} "
-                    sudo yum update
-                    sudo yum install -y awscli
+                    sudo apt update && apt upgrade -y
+                    sudo apt install -y awscli
                     aws configure set aws_access_key_id \${AWS_ACCESS_KEY_ID}
                     aws configure set aws_secret_access_key \${AWS_SECRET_ACCESS_KEY}
                     aws configure set default.region \${AWS_DEFAULT_REGION}
