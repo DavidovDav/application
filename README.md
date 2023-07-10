@@ -8,6 +8,9 @@ Which tools the project using for: Cloud - AWS
 6. Scripting: Bash
 7. CI/CD: jenkins
 
+## Project Tology:
+![img](application-portfolio.jpg)
+
 ## AWS
 * Note that the public ip addresses changes each time the machines are restarted, if you dont use Elastic IP or DNS so need to make changes in Jenkins base url, Jenkinsfile and GitHub Webhook. 
 ### EC2: 2 instances
@@ -26,12 +29,8 @@ update the version of the releases in the next files:
 2. **CHANGELOG.md** is a file that shows all the versions history and their changes, so when release a new version, recommended to modify this file.
 
 ## Jenkins 
-### To run Jenkins container with docker:
-#### Before running the jenkins container create a repo for jenkins volume with the right permissions:
-<sup>mkdir jenkins_home && sudo chown -R $USER:$USER ~/jenkins_home</sup>
-#### Run the jenkins container:
-<sup>docker run -d --name jenkins -p 8080:8080 -p 50000:50000 -v /var/run/docker.sock:/var/run/docker.sock -v ~/jenkins_home/:/var/jenkins_home/ jenkins/jenkins:lts</sup>
-#### Install docker inside the jenkins container:
+To run Jenkins container run the command '<sup>bash jenkins-start.sh</sup>'.
+### Install docker inside the jenkins container:
 <sup>curl https://get.docker.com/ > dockerinstall && chmod 777 dockerinstall && ./dockerinstall</sup>
 
 * Open Port 8080 in the Security Group for using jenkins.
@@ -56,8 +55,9 @@ update the version of the releases in the next files:
 Reverse proxy
 ### Mongo-DB
 
-## other files and scripts:
+## Scripts:
 * **delete-tags.sh** that clean the history of tags in local and remote repo if you need.
 * **reset.sh** that remove all docker proccess except from the python base image and the jenkins services.
 * **prod-reset.sh** almost the same script like "reset.sh", but "prod-reset.sh" dont remove the mongodb volume and python base image.
 * **install-docker.sh** install Docker and Docker compose.
+* **jenkins-start.sh** run jenkins container.
