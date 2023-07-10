@@ -8,7 +8,7 @@ Which tools the project using for: Cloud - AWS
 6. Scripting: Bash
 7. CI/CD: jenkins
 
-## Project Tology:
+## Project Topology:
 ![img](application-portfolio.jpg)
 
 ## AWS
