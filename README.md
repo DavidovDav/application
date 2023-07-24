@@ -61,11 +61,7 @@ After a push is made, a trigger is activated which notifies Jenkins and activate
 1. Use the **push-release.sh** script when you release a new version. Is tags, commits, and pushes to the remote repository.
 2. **CHANGELOG.md** is a file that shows the version history and their changes. When releasing a new version, it is recommended to modify this file.
 
-### Application 
-#### Flask:
-#### Nginx:
-Reverse proxy
-#### Mongo-DB
+
 
 ### Scripts:
 * **delete-tags.sh** Cleans the history of tags in the local and remote repositories.

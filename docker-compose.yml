@@ -5,6 +5,7 @@ services:
     container_name: nginx
     build: .
     hostname: nginx
+    restart: always
     volumes:
       - ./flask/templates:/usr/share/nginx/html/templates:rw
     #  - ./nginx.conf:/etc/nginx/conf.d/:rw
@@ -19,6 +20,7 @@ services:
     container_name: flask
     build: ./flask/
     hostname: flask
+    restart: always
     links:
       - mongo
     depends_on:
@@ -37,6 +39,7 @@ services:
     container_name: mongo
     image: mongo:6.0
     hostname: mongo
+    restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: pass

@@ -36,7 +36,7 @@
 	</form>
     
     <h2>Update Person</h2>
-	<form action="/person/<person_id>/update" method="PUT" id="update-form">
+	<form action="/person/<person_id>/update" method="POST" id="update-form">
 		<div>
     		<label for="person_id">ID:</label>
     		<input type="text" id="person_id" name="person_id" required><br><br>
@@ -65,16 +65,40 @@
 	</form>
 
     <h2>Delete Person</h2>
-	<form action="/person/<person_id>/delete" method="DELETE" id="delete-form">
+	<!-- <form action="/person/<person_id>/delete" method="DELETE" id="delete-form"> -->
+        <form onsubmit="deletePerson(event)" id="delete-form">
 		<div>
 			<label for="person_id">ID:</label><br>
 			<input type="text" id="person_id" name="person_id"><br>
 			<button type="submit">Delete Person</button>
 		</div>
 	</form>
+	
+	<script>
+		function deletePerson(event){
+			event.preventDefault();
+			const personId = document.getElementById("person_id").value;
+			fetch('/person/${personId}/delete', {
+				method: "DELETE",
+			})
+			    .then((response => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    throw new Error("Failed to delete person.");
+                                }
+			})
+                        .then((data) => {
+                            alert(data.message);
+                        })
+			.catch((error) => {
+				alert(error.message);
+			});
+		}
+	</script>
 
 	<h2>Get Person</h2>
-	<form action="/person/<person_id>" method="GET" id="get-form">
+	<form action="/person/" method="GET" id="get-form">
 		<div>
 			<label for="person_id">ID:</label><br>
 			<input type="text" id="person_id" name="person_id"><br>

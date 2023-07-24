@@ -9,14 +9,13 @@ from bson import ObjectId
 app = Flask(__name__)
 # Create and execute mongodb
 def get_db():
-    client = MongoClient(host="mongo",
-                        port=27017,
-                        username="root",
-                        password="pass",
+    client = MongoClient(host="mongo", 
+                        port=27017, 
+                        username="root", 
+                        password="pass", 
                         authSource="admin")
     # Connect to data base then to collection (/myMongo/people)
-    db = client["mongo"]
-    db["myPeople"].create_index("person_id", unique=True)
+    db = client["myMongo"]
     return db
 
 # Home page.
@@ -28,16 +27,19 @@ def home():
 def hello():
     return "Hello! v0.1.0"
 
-@app.route("/person/", methods=["GET"])
-def get_person():
-    person_id = request.args.get("person_id")
-    if not person_id:
-        return jsonify({"error": "Person ID not provided."}), 400
+@app.route("/person/<person_id>", methods=["GET"])
+def get_person(person_id):
     db = get_db()
     people = db["myPeople"]
-    person = people.find_one({"person_id": person_id})
+
+    try:
+	person_id = ObjectId(person_id)
+    except InvalidId:
+	return jsonfiy({"error": "Invalid object ID."}), 400
+
+    person = people.find_one({"_id": person_id})
+
     if person:
-        person["person_id"] = str(person["person_id"])
         return jsonify(person), 200
     else:
         return jsonify({"error": "Person not found."}), 404
@@ -51,8 +53,7 @@ def get_peoples():
         people = db["myPeople"]
         _peoples = people.find()
         peoples = [{
-	    "person_id": person["person_id"],
-            #"person_id": str(person["_id"]),
+            "person_id": str(person["_id"]),
             "name": person["name"],
             "age": person["age"],
             "gender": person["gender"],
@@ -76,24 +77,23 @@ def create_person():
     gender = request.form.get("gender")
     phone = request.form.get("phone")
     new_person = {
-        "person_id": person_id,
         "name": name,
         "age": age,
         "gender": gender,
         "phone": phone
-    }
-    try:
-        result = people.insert_one(new_person)
-    except pymongo.errors.DuplicateKeyError:
-        return jsonify({"error": "Person with the same ID already exists."}), 400
-    return jsonify({"person_id": person_id, "message": "Person created succefully!"})
+        }
+    result = people.insert_one(new_person)
+    return jsonify({"person_id": str(result.inserted_id)}, {"message": "Person created succefully!"})
 
 # Update person data
 @app.route("/person/<person_id>/update", methods=["POST"])
 def update_person(person_id):
     db = get_db()
     people = db["myPeople"]
+
     person_id = request.form.get("person_id")
+    person_id = ObjectId(person_id)
+
     name = request.form.get("name")
     age = request.form.get("age")
     gender = request.form.get("gender")
@@ -104,8 +104,7 @@ def update_person(person_id):
         "gender": gender,
         "phone": phone
     }
-    #result = people.update_one({"_id": ObjectId(person_id)}, {"$set": person_data})
-    result = people.update_one({"person_id": person_id}, {"$set": person_data})
+    result = people.update_one({"_id": ObjectId(person_id)}, {"$set": person_data})
     if result.modified_count > 0:
         return jsonify({"message": "Person updated successfully!"}), 200
     else:
@@ -113,20 +112,24 @@ def update_person(person_id):
 
 # Delete some person.
 @app.route("/person/<person_id>/delete", methods=["DELETE"])
-def delete_person(person_id):
+def delete_person(person_id): 
     #person_id = request.form.get("person_id")
     db = get_db()
     people = db["myPeople"]
-    #try:
-    #    person_id = ObjectId(person_id)
-    #except bson.errors.InvalidId:
-    #    return jsonify({"error": "invaild object id."}), 400
-    person = people.find_one({"person_id": person_id})
+    
+    try:
+        person_id = ObjectId(person_id)
+    except bson.errors.InvaildId:
+        return jsonify({"error": "invaild object id."}), 400
+    
+    person = people.find_one({"_id": person_id})
     if person is None:
         return jsonify({"error": "Person not found."}), 404
-    result = people.delete_one({"person_id": person_id})
+    
+    result = people.delete_one({"_id": person_id})
     if result.deleted_count == 0:
         return jsonify({"error": "Failed to delete person."}), 500
+    
     return jsonify({"message": "Person deleted successfully!"}), 200
 
 @app.after_request
